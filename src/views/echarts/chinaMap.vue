@@ -30,6 +30,8 @@
 
 <script>
   import cityMap from "@/js/china-main-city-map.js";
+  import {geoCoordMap1, data1, geoCoordMap3, data3, geoCoordMap2, data2} from "@/js/test1.js";
+
   import echarts from "echarts";
   import axios from "axios";
   import Vue from "vue";
@@ -134,134 +136,12 @@
    */
   function registerAndsetOption(myChart, id, name, mapJson, flag) {
     echarts.registerMap(name, mapJson);
-    if (id === "320000") {
-      debugger
-      var uploadedDataURL = "static/json/map/"+id+".json";
-      axios.get(uploadedDataURL, {}).then(response => {
-        const geoCoordMap = {
-          '南京市': [118.767413,32.041544],
-          '无锡市': [120.301663,31.574729],
-          '徐州市': [117.184811,34.261792],
-          '常州市': [119.946973,31.772752],
-          '苏州市': [120.619585,31.299379],
-          '南通市': [120.864608,32.016212],
-          '连云港市': [119.178821,34.600018],
-          '淮安市': [119.021265,33.597506],
-          '盐城市': [120.139998,33.377631],
-          '扬州市': [119.421003,32.393159],
-          '镇江市': [119.452753,32.204402],
-          '泰州市': [119.915176,32.484882],
-          '宿迁市': [118.275162,33.963008],
-        }
-        const data = [
-          {name: '南京市', value: 199},
-          {name: '无锡市', value: 39},
-          {name: '徐州市', value: 152},
-          {name: '常州市', value: 299},
-          {name: '苏州市', value: 89},
-          {name: '南通市', value: 52},
-          {name: '连云港市', value: 9},
-          {name: '淮安市', value: 352},
-          {name: '盐城市', value: 99},
-          {name: '扬州市', value: 39},
-          {name: '镇江市', value: 480},
-          {name: '泰州市', value: 39},
-          {name: '宿迁市', value: 480}
-        ];
-
-        var convertData = function (data) {
-          var res = [];
-          for (var i = 0; i < data.length; i++) {
-            var geoCoord = geoCoordMap[data[i].name];
-            if (geoCoord) {
-              res.push({
-                name: data[i].name,
-                value: geoCoord.concat(data[i].value)
-              });
-            }
-          }
-          return res;
-        };
-        myChart.setOption({
-          title: {
-            text: name + " 标题",
-            subtext: '',
-            x: 'center',
-            textStyle: {
-              color: '#ccc'
-            }
-          },
-          tooltip: {
-            show: true,
-            trigger: 'item',
-            formatter: function (params) {
-              if (typeof(params.value)[2] == "undefined") {
-                return params.name
-              } else {
-                return params.name
-              }
-            }
-          },
-          geo: {
-            show: false,
-            map: name,
-          },
-          series: [
-            {
-              type: "map",
-              map: name,
-              itemStyle: {
-                normal: {
-                  areaColor: "rgba(23, 27, 57,0)",
-                  borderColor: "#1dc199",
-                  borderWidth: 1
-                }
-              },
-              data: initMapData(mapJson)
-            },{
-              name: 'credit_pm2.5',
-              type: 'scatter',
-              coordinateSystem: 'geo',
-              data: convertData(data),
-              symbolSize: function (val) {
-                return val[2] / 10;
-              },
-              label: {
-                normal: {
-                  formatter: '{b}',
-                  position: 'right',
-                  show: true
-                },
-                emphasis: {
-                  show: true
-                }
-              },
-              itemStyle: {
-                normal: {
-                  color: '#05C3F9'
-                }
-              },
-            },
-          ]
-        });
-      },true);
+    if (id == "320400") {
+      loadData(id, name, mapJson, geoCoordMap3, data3)
+    } else if (id == "320000") {
+      loadData(id, name, mapJson, geoCoordMap1, data1)
     } else {
-      myChart.setOption({
-        series: [
-          {
-            type: "map",
-            map: name,
-            itemStyle: {
-              normal: {
-                areaColor: "rgba(23, 27, 57,0)",
-                borderColor: "#1dc199",
-                borderWidth: 1
-              }
-            },
-            data: initMapData(mapJson)
-          }
-        ]
-      },true)
+      loadData("100000", name, mapJson, geoCoordMap2, data2)
     }
 
     if (flag) {
@@ -284,6 +164,89 @@
       });
     }
     return mapData;
+  }
+
+
+  function loadData(id, name, mapJson, geoCoordMap, data) {
+    var uploadedDataURL = "static/json/map/" + id + ".json";
+    axios.get(uploadedDataURL, {}).then(response => {
+      var convertData = function (data) {
+        var res = [];
+        for (var i = 0; i < data.length; i++) {
+          var geoCoord = geoCoordMap[data[i].name];
+          if (geoCoord) {
+            res.push({
+              name: data[i].name,
+              value: geoCoord.concat(data[i].value)
+            });
+          }
+        }
+        return res;
+      };
+      myChart.setOption({
+        title: {
+          text: name + " 标题",
+          subtext: '',
+          x: 'center',
+          textStyle: {
+            color: '#ccc'
+          }
+        },
+        tooltip: {
+          show: true,
+          trigger: 'item',
+          formatter: function (params) {
+            if (typeof(params.value)[2] == "undefined") {
+              return params.name
+            } else {
+              return params.name
+            }
+          }
+        },
+        geo: {
+          show: false,
+          map: name,
+        },
+        series: [
+          {
+            type: "map",
+            map: name,
+            itemStyle: {
+              normal: {
+                areaColor: "rgba(23, 27, 57,0)",
+                borderColor: "#1dc199",
+                borderWidth: 1
+              }
+            },
+            data: initMapData(mapJson)
+          }, {
+            name: 'credit_pm2.5',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: convertData(data),
+            symbolSize: function (val) {
+              return val[2] / 10;
+            },
+            label: {
+              normal: {
+                formatter: '{b}',
+                position: 'right',
+                show: true
+              },
+              emphasis: {
+                show: true
+              }
+            },
+            itemStyle: {
+              normal: {
+                color: '#05C3F9'
+              }
+            },
+          },
+        ]
+      });
+    }, true);
+    echarts.registerMap(name, mapJson);
   }
 </script>
 
