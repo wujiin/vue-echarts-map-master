@@ -166,7 +166,7 @@
     return mapData;
   }
 
-
+  //加载数据
   function loadData(id, name, mapJson, geoCoordMap, data) {
     var uploadedDataURL = "static/json/map/" + id + ".json";
     axios.get(uploadedDataURL, {}).then(response => {
